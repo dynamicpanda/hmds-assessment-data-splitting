@@ -89,6 +89,11 @@ class Record(dict):
 
 
 class Batch(dict):
+    """Class representing a batch of records. Record in the batch are
+    identified by their sequence IDs (and are stored in the Batch dictionary
+    as such). Allows for aggregate actions to be performed on records, for
+    instance merging multiple records in a batch together.
+    """
 
     def add(self, record):
         """Add the record provided to the batch, using its sequence ID as the
