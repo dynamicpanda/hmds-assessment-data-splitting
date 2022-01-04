@@ -121,6 +121,58 @@ class Batch(dict):
             self[main_record_id].merge(self.pop(merge_id))
 
 
+def merge_addresses(batch):
+    """Merge records within the batch which have matching address fields.
+    Address fields are defined by the ADDRESS_FIELDS constant.
+
+    :param batch: The batch of records to attempt to merge
+    :type batch: Batch
+    :return: The batch with merged records
+    :rtype: Batch
+    """
+
+    # merge records with same address info
+    addresses = defaultdict(set)
+    for sequence_id in list(batch.keys()):
+        # combine address fields as one string to act as a key
+        record = batch[sequence_id]
+        address = ''.join((record[field] for field in ADDRESS_FIELDS))
+        addresses[address].add(sequence_id)
+
+    # merge sequence IDs with like addresses into the record with the
+    # lowest sequence ID
+    for address, sequence_ids in addresses.items():
+        if len(sequence_ids) > 1:
+            sorted_sequence_ids = sorted(sequence_ids)
+            main_record_id = sorted_sequence_ids[0]
+            merge_record_ids = sorted_sequence_ids[1:]
+
+            logging.info(f'Merging IDs {main_record_id} into record '
+                         f'{merge_record_ids}...')
+            batch.merge(main_record_id, *merge_record_ids)
+
+    return batch
+
+
+def get_groups(batch):
+    """Get groups of batches of records based on grouping fields. Grouping
+    fields are defined by the GROUP_BY_FIELDS constant.
+
+    :param batch: The batch containing records to group
+    :type batch: Batch
+    :return: A mapping of all individually grouped batches
+    :rtype: defaultdict(Batch)
+    """
+
+    # group batch by defined fields
+    groups = defaultdict(Batch)
+    for record in batch.values():
+        key = tuple(record[field] for field in GROUP_BY_FIELDS)
+        groups[key].add(record)
+
+    return groups
+
+
 if __name__ == '__main__':
     logging.info(f'Starting {__file__} on {socket.gethostname()}...')
 
@@ -142,25 +194,7 @@ if __name__ == '__main__':
                 batch.add(Record(row['SEQUENCE_ID'], **row))
         logging.debug(f'Batch: {pprint.pformat(batch)}')
 
-        # merge records with same address info
-        addresses = defaultdict(set)
-        for sequence_id in list(batch.keys()):
-            # combine address fields as one string to act as a key
-            record = batch[sequence_id]
-            address = ''.join((record[field] for field in ADDRESS_FIELDS))
-            addresses[address].add(sequence_id)
-
-        # merge sequence IDs with like addresses into the record with the
-        # lowest sequence ID
-        for address, sequence_ids in addresses.items():
-            if len(sequence_ids) > 1:
-                sorted_sequence_ids = sorted(sequence_ids)
-                main_record_id = sorted_sequence_ids[0]
-                merge_record_ids = sorted_sequence_ids[1:]
-
-                logging.info(f'Merging IDs {main_record_id} into record '
-                             f'{merge_record_ids}...')
-                batch.merge(main_record_id, *merge_record_ids)
+        batch = merge_addresses(batch)
 
         # dump the records into the final JSON file
         final_json_path = os.path.join(OUTPUT_LOCATION, FINAL_JSON_NAME)
@@ -168,11 +202,7 @@ if __name__ == '__main__':
         with open(final_json_path, 'w') as final_json_file:
             json.dump(batch, final_json_file, indent=4, sort_keys=True)
 
-        # group batch by defined fields
-        groups = defaultdict(Batch)
-        for sequence_id, record in batch.items():
-            key = tuple(record[field] for field in GROUP_BY_FIELDS)
-            groups[key].add(record)
+        groups = get_groups(batch)
         logging.debug(f'Groups: {pprint.pformat(groups)}')
 
         # dump each group of records into its own JSON file
