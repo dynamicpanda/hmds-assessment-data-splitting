@@ -50,7 +50,7 @@ class Record(dict):
 
     def __init__(self, sequence_id, *args, **kwargs):
         """Initialize the Record with sequence ID and any starting dictionary
-        data.
+        data. Also initialize a merged sequence IDs field for tracking merges.
 
         :param sequence_id: The sequence ID identifying the record
         :type sequence_id: str
@@ -62,7 +62,7 @@ class Record(dict):
 
     @property
     def sequence_id(self):
-        """Get the sequence ID of this record
+        """Get the sequence ID of this record.
 
         :return: The sequence ID of the record
         :rtype: str
@@ -71,7 +71,7 @@ class Record(dict):
 
     @property
     def merged_sequence_ids(self):
-        """Get the merged sequence IDs within this record
+        """Get the merged sequence IDs within this record.
 
         :return: The merged sequenced IDs within the record
         :rtype: list
@@ -82,7 +82,7 @@ class Record(dict):
         """Merge the record provided into this record. Prioritize the data of
         this record when data differs.
 
-        :param other_record: The record to merge into this one.
+        :param other_record: The record to merge into this one
         :type other_record: Record
         """
         self['MERGED_SEQUENCE_IDS'].append(other_record.sequence_id)
@@ -109,10 +109,10 @@ class Batch(dict):
         the main record ID provided, removing all merged records.
 
         :param main_record_id: The ID of the main record into which the
-        other(s) will be merged.
+        other(s) will be merged
         :type main_record_id: str
         :param merge_ids: The IDs in the batch of the records which will be
-        merged into the main record.
+        merged into the main record
         :type merge_ids: tuple
         """
 
