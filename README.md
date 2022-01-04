@@ -1,5 +1,10 @@
 # HMDS Developer Assessment - Data Splitting
 
+## Summary
+This project is part of a developer coding assessment for an HM Document Solutions Senior Application Developer position.
+
+The script for this project exists to split and group record data (addresses, names, etc.) while converting from CSV to JSON.
+
 ## Requirements
 > ### Submission
 > Code should be uploaded to your source control platform of choice (Gitlab/Github/Bitbucket) and made available to the hiring team. Follow the proper source control pipeline showing branching/commit/push/merge etc. Be prepared to discuss your thought process during the interview. Feel free to provide any other documentation you feel would be helpful.
