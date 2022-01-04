@@ -81,9 +81,6 @@ class Record(dict):
     def merge(self, other_record):
         """Merge the record provided into this record. Prioritize the data of
         this record when data differs.
-        TODO: Clarify these requirements. Should different data always be
-        accepted?
-        TODO: Should merges be handled as a natural join? outer?
 
         :param other_record: The record to merge into this one.
         :type other_record: Record
@@ -149,7 +146,6 @@ if __name__ == '__main__':
         addresses = defaultdict(set)
         for sequence_id in list(batch.keys()):
             # combine address fields as one string to act as a key
-            # TODO: Clarify whether whitespace stripping is preferred
             record = batch[sequence_id]
             address = ''.join((record[field] for field in ADDRESS_FIELDS))
             addresses[address].add(sequence_id)
