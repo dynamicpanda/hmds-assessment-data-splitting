@@ -1,0 +1,11 @@
+# ignore .vscode internal folder
+.vscode
+
+# ignore results folder so data can always be fresh
+results
+
+# ignore macbook files
+.DS_Store
+
+# ignore temporary Microsoft files
+~$*
