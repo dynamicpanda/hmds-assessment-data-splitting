@@ -40,8 +40,18 @@ OUTPUT_LOCATION = os.path.join(
 
 
 class Record(dict):
+    """Class representing a record, namely that in a batch. All records
+    include sequence IDs and other supplemental data which may be stored in the
+    Record object like any other dictionary.
+    """
 
     def __init__(self, sequence_id, *args, **kwargs):
+        """Initialize the Record with sequence ID and any starting dictionary
+        data.
+
+        :param sequence_id: The sequence ID identifying the record
+        :type sequence_id: str
+        """
         super().__init__(*args, **kwargs)
 
         self.__sequence_id = sequence_id
